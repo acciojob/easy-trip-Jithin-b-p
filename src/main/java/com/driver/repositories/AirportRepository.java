@@ -181,7 +181,15 @@ public class AirportRepository {
 
         if(flightDb.containsKey(flightId)){
 
-            return flightDb.get(flightId).getFromCity().toString();
+            City city = flightDb.get(flightId).getFromCity();
+            for(Airport airport: airportDb.values()){
+
+                if(airport.getCity().equals(city)){
+
+                    return airport.getAirportName();
+                }
+            }
+
         }
 
         return null;
