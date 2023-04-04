@@ -212,7 +212,7 @@ public class AirportRepository {
 
             if(flight.getFlightDate().equals(date)){
 
-                if(flight.getFromCity().equals(airportName) || flight.getToCity().equals(airportName)){
+                if(flight.getFromCity().toString().equals(airportName) || flight.getToCity().toString().equals(airportName)){
 
                     flights.add(flight.getFlightId());
 
