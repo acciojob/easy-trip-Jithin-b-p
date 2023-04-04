@@ -223,33 +223,35 @@ public class AirportRepository {
 
     public int getNumberOfPeopleOn(Date date, String airportName){
 
+        int totalpeople = 0;
+        if(airportDb.containsKey(airportName)){
 
-        List<Integer> flights = new ArrayList<>();
-        if(flightDb.isEmpty()) return 0;
-        for(Flight flight: flightDb.values()){
+            Airport airport = airportDb.get(airportName);
+            List<Integer> flights = new ArrayList<>();
+            if(flightDb.isEmpty()) return 0;
+            for(Flight flight: flightDb.values()){
 
-            if(flight.getFromCity().toString().equals(airportName) || flight.getToCity().toString().equals(airportName)){
+                if(flight.getFromCity().equals(airport.getCity()) || flight.getToCity().equals(airport.getCity())){
 
 
-                if(flight.getFlightDate().equals(date)){
+                    if(flight.getFlightDate().equals(date)){
 
-                    flights.add(flight.getFlightId());
+                        flights.add(flight.getFlightId());
+
+                    }
 
                 }
 
             }
+            for(Integer flightId: flights){
+
+                totalpeople += flightBookingDb.get(flightId).size();
+
+            }
 
         }
-
-        int totalpeople = 0;
-
-        for(Integer flightId: flights){
-
-            totalpeople += flightBookingDb.get(flightId).size();
-
-        }
-
         return totalpeople;
+
     }
 
 
