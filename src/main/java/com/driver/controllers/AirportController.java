@@ -5,6 +5,7 @@ import com.driver.model.Airport;
 import com.driver.model.City;
 import com.driver.model.Flight;
 import com.driver.model.Passenger;
+import com.driver.services.AirportService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -16,12 +17,16 @@ import java.util.Objects;
 
 @RestController
 public class AirportController {
+
+
+    AirportService airportService = new AirportService();
+
     @PostMapping("/add_airport")
     public String addAirport(@RequestBody Airport airport){
 
         //Simply add airport details to your database
         //Return a String message "SUCCESS"
-
+        if(airport != null) airportService.addAirport(airport);
         return "SUCCESS";
     }
 
@@ -30,8 +35,8 @@ public class AirportController {
 
         //Largest airport is in terms of terminals. 3 terminal airport is larger than 2 terminal airport
         //Incase of a tie return the Lexicographically smallest airportName
+        return airportService.getLargestAirport();
 
-       return null;
     }
 
     @GetMapping("/get-shortest-time-travel-between-cities")
@@ -39,8 +44,14 @@ public class AirportController {
 
         //Find the duration by finding the shortest flight that connects these 2 cities directly
         //If there is no direct flight between 2 cities return -1.
+        double duration = airportService.getShortestDurationOfPossibleBetweenTwoCities(fromCity, toCity);
+        if(duration == Double.MAX_VALUE){
 
-       return 0;
+            return -1;
+
+        }
+        return duration;
+
     }
 
     @GetMapping("/get-number-of-people-on-airport-on/{date}")
@@ -49,7 +60,7 @@ public class AirportController {
         //Calculate the total number of people who have flights on that day on a particular airport
         //This includes both the people who have come for a flight and who have landed on an airport after their flight
 
-        return 0;
+        return airportService.getNumberOfPeopleOn(date, airportName);
     }
 
     @GetMapping("/calculate-fare")
@@ -60,7 +71,8 @@ public class AirportController {
         //Suppose if 2 people have booked the flight already : the price of flight for the third person will be 3000 + 2*50 = 3100
         //This will not include the current person who is trying to book, he might also be just checking price
 
-       return 0;
+        if(flightId != null) return airportService.calculateFlightFare(flightId);
+        return 0;
 
     }
 
@@ -73,6 +85,7 @@ public class AirportController {
         //Also if the passenger has already booked a flight then also return "FAILURE".
         //else if you are able to book a ticket then return "SUCCESS"
 
+        if(flightId != null && passengerId != null) return airportService.bookATicket(flightId, passengerId);
         return null;
     }
 
@@ -83,8 +96,8 @@ public class AirportController {
         // then return a "FAILURE" message
         // Otherwise return a "SUCCESS" message
         // and also cancel the ticket that passenger had booked earlier on the given flightId
-
-       return null;
+        if(flightId != null && passengerId != null) return airportService.cancelATicket(flightId, passengerId);
+        return null;
     }
 
 
@@ -92,6 +105,7 @@ public class AirportController {
     public int countOfBookingsDoneByPassengerAllCombined(@PathVariable("passengerId")Integer passengerId){
 
         //Tell the count of flight bookings done by a passenger: This will tell the total count of flight bookings done by a passenger :
+        if(passengerId != null) return airportService.countOfBookingsDoneByPassengerAllCombined(passengerId);
        return 0;
     }
 
@@ -99,7 +113,12 @@ public class AirportController {
     public String addFlight(@RequestBody Flight flight){
 
         //Return a "SUCCESS" message string after adding a flight.
-       return null;
+        if(flight != null){
+            airportService.addFlight(flight);
+            return "SUCCESS";
+        }
+        return null;
+
     }
 
 
@@ -109,6 +128,7 @@ public class AirportController {
         //We need to get the starting airportName from where the flight will be taking off (Hint think of City variable if that can be of some use)
         //return null incase the flightId is invalid or you are not able to find the airportName
 
+        if(flightId != null) return airportService.getAirportNameFromFlightId(flightId);
         return null;
     }
 
@@ -120,6 +140,9 @@ public class AirportController {
         //That is of all the passengers that have booked a flight till now and then calculate the revenue
         //Revenue will also decrease if some passenger cancels the flight
 
+        if(flightId != null){
+            return airportService.calculateRevenueOfAFlight(flightId);
+        }
 
         return 0;
     }
@@ -130,8 +153,12 @@ public class AirportController {
 
         //Add a passenger to the database
         //And return a "SUCCESS" message if the passenger has been added successfully.
+        if(passenger != null){
+            airportService.addPassenger(passenger);
+            return "SUCCESS";
+        }
+        return null;
 
-       return null;
     }
 
 
