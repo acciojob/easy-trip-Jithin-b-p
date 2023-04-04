@@ -57,6 +57,7 @@ public class AirportRepository {
         flightBookingDb.put(flight.getFlightId(), new HashSet<>());
         flightCurrentFareDb.put(flight.getFlightId(), 3000);
         flightRevenueLiveDb.put(flight.getFlightId(), 0);
+        flightPassengerFareDb.put(flight.getFlightId(), new HashMap<>());
 
     }
 
@@ -86,17 +87,17 @@ public class AirportRepository {
 
             }
 
-            int noOfPeopleWhoHaveAlreadyBooked = flightBookingDb.get(flightId).size();
-            Integer currentPrice = 3000 + noOfPeopleWhoHaveAlreadyBooked * 50;
-            flightCurrentFareDb.put(flightId, currentPrice);
-            flightPassengerFareDb.put(flightId, new HashMap<>(passengerId, currentPrice));
-            flightRevenueLiveDb.put(flightId, flightRevenueLiveDb.getOrDefault(flightId, 0) + currentPrice);
 
         }
 
         if(flightBookingDb.get(flightId).contains(passengerId)) return "FAILURE";
-
+        int noOfPeopleWhoHaveAlreadyBooked = flightBookingDb.get(flightId).size();
+        Integer currentPrice = 3000 + noOfPeopleWhoHaveAlreadyBooked * 50;
+        flightCurrentFareDb.put(flightId, currentPrice);
+        flightPassengerFareDb.put(flightId, new HashMap<>(passengerId, currentPrice));
+        flightRevenueLiveDb.put(flightId, flightRevenueLiveDb.getOrDefault(flightId, 0) + currentPrice);
         flightBookingDb.get(flightId).add(passengerId);
+
         passangerBookingCountDb.put(passengerId, passangerBookingCountDb.getOrDefault(passengerId, 0) + 1);
         return "SUCCESS";
     }
@@ -107,18 +108,22 @@ public class AirportRepository {
 
         if(!flightBookingDb.get(flightId).contains(passengerId)) return "FAILURE";
 
-        flightBookingDb.get(flightId).remove(passengerId);
+        if(flightBookingDb.containsKey(flightId)){
+            flightBookingDb.get(flightId).remove(passengerId);
 
-        Map<Integer, Integer> passengerFairPaid = flightPassengerFareDb.get(flightId);
-        int farePaidByTheCurrentPassenger = passengerFairPaid.get(passengerId);
+            Map<Integer, Integer> passengerFairPaid = flightPassengerFareDb.get(flightId);
+            int farePaidByTheCurrentPassenger = passengerFairPaid.get(passengerId);
 
-        flightRevenueLiveDb.put(flightId, flightRevenueLiveDb.getOrDefault(flightId, 0) - farePaidByTheCurrentPassenger);
+            flightRevenueLiveDb.put(flightId, flightRevenueLiveDb.getOrDefault(flightId, 0) - farePaidByTheCurrentPassenger);
 
-        int noOfPeopleWhoHaveAlreadyBooked = flightBookingDb.get(flightId).size();
-        int currentPrice = 3000 + noOfPeopleWhoHaveAlreadyBooked * 50;
-        flightCurrentFareDb.put(flightId, currentPrice);
+            int noOfPeopleWhoHaveAlreadyBooked = flightBookingDb.get(flightId).size();
+            int currentPrice = 3000 + noOfPeopleWhoHaveAlreadyBooked * 50;
+            flightCurrentFareDb.put(flightId, currentPrice);
 
-        return "SUCCESS";
+            return "SUCCESS";
+        }
+        return "FAILURE";
+
 
     }
 
