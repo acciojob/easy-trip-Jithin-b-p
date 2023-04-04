@@ -8,13 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-class Pair{
 
-    Integer passengerID;
-    Integer farePaid;
-
-
-}
 @Repository
 public class AirportRepository {
 
@@ -216,7 +210,7 @@ public class AirportRepository {
         List<Integer> flights = new ArrayList<>();
         for(Flight flight: flightDb.values()){
 
-            if(flight.getFlightDate() == date){
+            if(flight.getFlightDate().equals(date)){
 
                 if(flight.getFromCity().equals(airportName) || flight.getToCity().equals(airportName)){
 
