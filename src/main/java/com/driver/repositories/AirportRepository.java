@@ -47,11 +47,16 @@ public class AirportRepository {
 
     public void addFlight(Flight flight){
 
-        flightDb.put(flight.getFlightId(), flight);
-        flightBookingDb.put(flight.getFlightId(), new HashSet<>());
-        flightCurrentFareDb.put(flight.getFlightId(), 3000);
-        flightRevenueLiveDb.put(flight.getFlightId(), 0);
-        flightPassengerFareDb.put(flight.getFlightId(), new HashMap<>());
+        if(!flightDb.containsKey(flight)){
+            flightDb.put(flight.getFlightId(), flight);
+            flightBookingDb.put(flight.getFlightId(), new HashSet<>());
+            flightCurrentFareDb.put(flight.getFlightId(), 3000);
+            flightRevenueLiveDb.put(flight.getFlightId(), 0);
+            flightPassengerFareDb.put(flight.getFlightId(), new HashMap<>());
+        }
+
+
+
 
     }
 
@@ -84,13 +89,17 @@ public class AirportRepository {
 
         }
 
+
         if(flightBookingDb.get(flightId).contains(passengerId)) return "FAILURE";
-        int noOfPeopleWhoHaveAlreadyBooked = flightBookingDb.get(flightId).size();
-        Integer currentPrice = 3000 + noOfPeopleWhoHaveAlreadyBooked * 50;
-        flightCurrentFareDb.put(flightId, currentPrice);
-        flightPassengerFareDb.put(flightId, new HashMap<>(passengerId, currentPrice));
-        flightRevenueLiveDb.put(flightId, flightRevenueLiveDb.getOrDefault(flightId, 0) + currentPrice);
+
+        int currentPrice = flightCurrentFareDb.get(flightId);
         flightBookingDb.get(flightId).add(passengerId);
+        flightPassengerFareDb.get(flightId).put(passengerId,currentPrice);
+
+        flightRevenueLiveDb.put(flightId, flightRevenueLiveDb.getOrDefault(flightId, 0) + currentPrice);
+        int noOfPeopleWhoHaveAlreadyBooked = flightBookingDb.get(flightId).size();
+        Integer updatedCurrentPrice = 3000 + noOfPeopleWhoHaveAlreadyBooked * 50;
+        flightCurrentFareDb.put(flightId, updatedCurrentPrice);
 
         passangerBookingCountDb.put(passengerId, passangerBookingCountDb.getOrDefault(passengerId, 0) + 1);
         return "SUCCESS";
@@ -208,11 +217,13 @@ public class AirportRepository {
 
 
         List<Integer> flights = new ArrayList<>();
+        if(flightDb.isEmpty()) return 0;
         for(Flight flight: flightDb.values()){
 
-            if(flight.getFlightDate().equals(date)){
+            if(flight.getFromCity().toString().equals(airportName) || flight.getToCity().toString().equals(airportName)){
 
-                if(flight.getFromCity().toString().equals(airportName) || flight.getToCity().toString().equals(airportName)){
+
+                if(flight.getFlightDate().equals(date)){
 
                     flights.add(flight.getFlightId());
 
@@ -222,15 +233,15 @@ public class AirportRepository {
 
         }
 
-        int total_people = 0;
+        int totalpeople = 0;
 
         for(Integer flightId: flights){
 
-            total_people += flightBookingDb.get(flightId).size();
+            totalpeople += flightBookingDb.get(flightId).size();
 
         }
 
-        return total_people;
+        return totalpeople;
     }
 
 
